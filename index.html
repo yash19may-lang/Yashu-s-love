@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Surprise</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    transition: background 0.6s ease;
+    overflow: hidden;
+}
+
+/* Floating Hearts */
+.heart {
+    position: fixed;
+    bottom: -20px;
+    font-size: 20px;
+    animation: floatUp 6s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes floatUp {
+    to {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
+}
+
+.container {
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    transition: opacity 0.6s ease;
+}
+
+.visible {
+    opacity: 1;
+    position: relative;
+    pointer-events: all;
+    transition: opacity 0.6s ease;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    margin: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.refresh-btn {
+    background: #ff758c;
+    color: white;
+}
+
+.yes-btn {
+    background: #ff4e8a;
+    color: white;
+}
+
+.no-btn {
+    background: #ccc;
+}
+
+.message {
+    margin-top: 20px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: fall 5s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- 404 Screen -->
+    <div id="errorScreen" class="visible">
+        <h1>404 - Page Not Found</h1>
+        <p>Oops! Looks like love got lost.</p>
+        <button class="refresh-btn" onclick="showValentine()">Refresh</button>
+    </div>
+
+    <!-- Valentine Screen -->
+    <div id="valentineScreen" class="hidden">
+        <h1>Will you be my Valentine? ❤️</h1>
+        <div id="buttons">
+            <button class="yes-btn" id="yesBtn" onclick="sayYes()">YES</button>
+            <button class="no-btn" id="noBtn" onclick="sayNo()">NO</button>
+        </div>
+
+        <div id="yesMessage" class="message hidden">
+            <p><strong>By clicking YES you agree to:</strong></p>
+            <ul>
+                <li>You are only mine and mine alone. I will never ever share you with anyone else — understand that, just that</li>
+                <li>And right now you’re going to give me lots and lots of kisses, that’s it.</li>
+                <li>I loooove you bhauuuut saraaaaa </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop>
+    <source src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav" type="audio/wav">
+</audio>
+
+<script>
+let noClicks = 0;
+let yesScale = 1;
+let gradients = [
+    "linear-gradient(135deg, #a18cd1, #fbc2eb)",
+    "linear-gradient(135deg, #ffecd2, #fcb69f)",
+    "linear-gradient(135deg, #ff9a9e, #fecfef)",
+    "linear-gradient(135deg, #89f7fe, #66a6ff)"
+];
+
+function showValentine() {
+    document.getElementById("errorScreen").classList.replace("visible","hidden");
+    document.getElementById("valentineScreen").classList.replace("hidden","visible");
+    startHearts();
+}
+
+function sayYes() {
+    document.getElementById("bgMusic").play();
+
+    const buttons = document.getElementById("buttons");
+    const message = document.getElementById("yesMessage");
+
+    message.classList.replace("hidden","visible");
+
+    setTimeout(() => {
+        buttons.style.opacity = "0";
+        buttons.style.transition = "opacity 0.5s ease";
+    }, 1000);
+
+    launchConfetti();
+}
+
+function sayNo() {
+    document.getElementById("bgMusic").play();
+
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+
+    // Grow YES button
+    yesScale += 0.2;
+    yesBtn.style.transform = `scale(${yesScale})`;
+
+    // Random jump
+    const x = Math.random() * (window.innerWidth - 100);
+    const y = Math.random() * (window.innerHeight - 50);
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+
+    document.body.style.background =
+        gradients[Math.floor(Math.random() * gradients.length)];
+
+    noClicks++;
+    if (noClicks >= 2) {
+        noBtn.textContent = "🥺";
+    }
+}
+
+function launchConfetti() {
+    for (let i = 0; i < 120; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor =
+            `hsl(${Math.random() * 360}, 100%, 60%)`;
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.remove();
+        }, 5000);
+    }
+}
+
+function startHearts() {
+    setInterval(() => {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "💖";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 6000);
+    }, 500);
+}
+</script>
+
+</body>
+</html>
